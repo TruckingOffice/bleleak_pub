@@ -23,6 +23,9 @@ class BleReader extends Component {
     super(props)
     console.log('app constructor')
     this.state = {}
+  }
+
+  componentWillMount() {
     this.manager = new BleManager()
     const subscription = this.manager.onStateChange((state) => {
       if (state === 'PoweredOn') {
@@ -36,8 +39,8 @@ class BleReader extends Component {
     if (__DEV__) console.log('start scan')
     this.manager.startDeviceScan(null, null, async (error, device) => {
       console.log('Scanning...')
-      console.log(device.name)
       if (device && device.name && (device.name.includes(deviceName))) {
+        console.log(device.name)
         if (__DEV__) console.log('BLE found. connecting.')
         this.manager.stopDeviceScan()
         if (__DEV__) console.log('stop scan, clear timers ')
@@ -50,32 +53,23 @@ class BleReader extends Component {
           .then((device) => {
             console.log('Setting notifications')
             setInterval(() => {
-              console.log('interval ')
-              setTimeout(
-                () => {
-                  device.readCharacteristicForService(serviceUUID, characteristic1UUID)
-                    .then((res) => {
-                      console.log(`char1 ${res.value}`)
-                      this.setState({char1: res.value})
-                    })
-                }, 50)
-              setTimeout(
-                () => {
-                  device.readCharacteristicForService(serviceUUID, characteristic2UUID)
-                    .then((res) => {
-                      console.log(`char2 ${res.value}`)
-                      this.setState({char2: res.value})
-                    })
-                }, 50)
-              setTimeout(
-                () => {
-                  device.readCharacteristicForService(serviceUUID, characteristic3UUID)
-                    .then((res) => {
-                      console.log(`char3 ${res.value}`)
-                      this.setState({char3: res.value})
-                    })
-                }, 50)
-            }, 1000)
+              console.log('interval loop')
+              device.readCharacteristicForService(serviceUUID, characteristic1UUID)
+                .then((res) => {
+                  console.log(`char1 ${res.value}`)
+                  this.setState({char1: res.value})
+                })
+              device.readCharacteristicForService(serviceUUID, characteristic2UUID)
+                .then((res) => {
+                  console.log(`char2 ${res.value}`)
+                  this.setState({char2: res.value})
+                })
+              device.readCharacteristicForService(serviceUUID, characteristic3UUID)
+                .then((res) => {
+                  console.log(`char3 ${res.value}`)
+                  this.setState({char3: res.value})
+                })
+            }, 500)
           })
       }
     })
